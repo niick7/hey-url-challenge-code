@@ -1,0 +1,5 @@
+<% if @url.errors.size > 0 %>
+  $('.form_create_shorten_url').html("<%= escape_javascript(render partial: 'form')%>");
+<% else %>
+  $('.urls').html("<%= escape_javascript(render partial: 'index')%>");
+<% end %>

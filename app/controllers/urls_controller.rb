@@ -1,52 +1,51 @@
 # frozen_string_literal: true
 
+require 'browser'
+
 class UrlsController < ApplicationController
   def index
     # recent 10 short urls
     @url = Url.new
-    @urls = [
-      Url.new(short_url: 'ABCDE', original_url: 'http://google.com', created_at: Time.now),
-      Url.new(short_url: 'ABCDG', original_url: 'http://facebook.com', created_at: Time.now),
-      Url.new(short_url: 'ABCDF', original_url: 'http://yahoo.com', created_at: Time.now)
-    ]
+    @urls = Url.latest
   end
 
   def create
-    raise 'add some code'
-    # create a new URL record
+    @url = Url.new(url_params)
+    if @url.save
+      @url = Url.new
+      @urls = Url.latest
+    end
+    respond_to do |format|
+      format.js
+    end
   end
 
   def show
-    @url = Url.new(short_url: 'ABCDE', original_url: 'http://google.com', created_at: Time.now)
-    # implement queries
-    @daily_clicks = [
-      ['1', 13],
-      ['2', 2],
-      ['3', 1],
-      ['4', 7],
-      ['5', 20],
-      ['6', 18],
-      ['7', 10],
-      ['8', 20],
-      ['9', 15],
-      ['10', 5]
-    ]
-    @browsers_clicks = [
-      ['IE', 13],
-      ['Firefox', 22],
-      ['Chrome', 17],
-      ['Safari', 7]
-    ]
-    @platform_clicks = [
-      ['Windows', 13],
-      ['macOS', 22],
-      ['Ubuntu', 17],
-      ['Other', 7]
-    ]
+    @url = Url.find_by_short_url(params[:url])
+    if @url.present?
+      @metrics_clicks = @url.clicks
+                            .where('created_at > ? and created_at < ?', Time.now.beginning_of_month, Time.now.end_of_month)
+                            .group_by_day(:created_at)
+                            .count
+      @metrics_browsers = @url.clicks.group(:browser).count
+      @metrics_platforms = @url.clicks.group(:platform).count
+    else
+      render_not_found
+    end
   end
 
   def visit
     # params[:short_url]
-    render plain: 'redirecting to url...'
+    url = Url.find_by_short_url(params[:short_url]) or render_not_found
+    if url
+      url.clicks.create(platform: browser.platform.name, browser: browser.name)
+      redirect_to root_path
+    end
+  end
+
+  private
+
+  def url_params
+    params.require(:url).permit(:original_url, :short_url)
   end
 end

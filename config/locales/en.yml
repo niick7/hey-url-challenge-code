@@ -30,4 +30,9 @@
 # available at https://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+  activerecord:
+    attributes:
+      url:
+        original_url: 'Original URL'
+        short_url: 'Short URL'
+

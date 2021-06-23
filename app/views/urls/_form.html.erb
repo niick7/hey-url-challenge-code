@@ -1,0 +1,42 @@
+<div class="row">
+  <div class="col m12">
+    <%= form_for @url, html: { remote: true } do |f| %>
+      <div class="card">
+        <div class="card-content">
+          <% if @url.errors.size > 0 %>
+            <div class="row mb-0">
+              <div class="col m6 offset-m2 input-field mb-0">
+                <div class="card-panel notice deep-orange">
+                  <% @url.errors.full_messages.each do |message| %>
+                    <%= message %><br />
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+          <div class="row mb-0">
+            <div class="col m6 offset-m2 input-field mb-0">
+              <%= f.text_field :original_url, class: 'form-control', placeholder: 'Your original URL here', required: true %>
+              <span class="helper-text" data-error="wrong" data-success="right">MUST include HTTP and be valid</span>
+            </div>
+          </div>
+          <div class="row mb-0">
+            <div class="col m6 offset-m2 input-field">
+              <%= f.text_field :short_url, class: 'form-control', placeholder: 'Your short URL here', required: true %>
+              <span class="helper-text" data-error="wrong" data-success="right">MUST have 5 characters in length e.g. NELNT</span>
+              <span class="helper-text" data-error="wrong" data-success="right">MUST generate only upper case letters</span>
+              <span class="helper-text" data-error="wrong" data-success="right">MUST NOT generate special characters</span>
+              <span class="helper-text" data-error="wrong" data-success="right">MUST NOT generate whitespace</span>
+              <span class="helper-text" data-error="wrong" data-success="right">MUST be unique</span>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col m6 offset-m2">
+              <button type="submit" class="waves-effect waves-light btn">Create Shorten URL</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
